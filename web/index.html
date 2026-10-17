@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>流光壁纸 · Wallflow</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23e6b98c'/%3E%3Cstop offset='1' stop-color='%239aa7e8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='9' fill='url(%23g)'/%3E%3Cpath d='M9 21c3.5 0 4-10 7.5-10S20 21 23 21' stroke='%230b0c0e' stroke-width='2.2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" />
+<link rel="stylesheet" href="/style.css" />
+</head>
+<body data-tab="gallery">
+<svg class="sprite" aria-hidden="true">
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5-11-6.5Z" fill="currentColor"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6.5" y="5" width="3.6" height="14" rx="1.4" fill="currentColor"/><rect x="13.9" y="5" width="3.6" height="14" rx="1.4" fill="currentColor"/></symbol>
+  <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M4 12h16" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></symbol>
+  <symbol id="i-shuffle" viewBox="0 0 24 24"><path d="M3 6h3.2c4.2 0 5.4 12 9.6 12H20M17 15l3 3-3 3M3 18h3.2c1.5 0 2.6-1.5 3.6-3.4M14.4 8.7C15.4 7 16.3 6 17.8 6H20M17 3l3 3-3 3" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5" stroke="currentColor" stroke-width="1.7" fill="none"/><circle cx="9" cy="10" r="1.6" fill="currentColor"/><path d="m4.5 17 4.7-4.6a1.6 1.6 0 0 1 2.2 0l2.6 2.5 1.8-1.7a1.6 1.6 0 0 1 2.2 0l1.5 1.5" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3.5c.6 4.6 3.9 7.9 8.5 8.5-4.6.6-7.9 3.9-8.5 8.5-.6-4.6-3.9-7.9-8.5-8.5 4.6-.6 7.9-3.9 8.5-8.5Z" fill="currentColor"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.2" stroke="currentColor" stroke-width="1.7" fill="none"/><path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.5-5.8M20 4.5V10h-5.5" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.1" stroke="currentColor" stroke-width="1.7" fill="none"/><path d="M19.4 13.5a7.8 7.8 0 0 0 0-3l2-1.5-2-3.4-2.4.9a7.7 7.7 0 0 0-2.6-1.5L14 2.5h-4L9.6 5a7.7 7.7 0 0 0-2.6 1.5l-2.4-.9-2 3.4 2 1.5a7.8 7.8 0 0 0 0 3l-2 1.5 2 3.4 2.4-.9a7.7 7.7 0 0 0 2.6 1.5l.4 2.5h4l.4-2.5a7.7 7.7 0 0 0 2.6-1.5l2.4.9 2-3.4-2-1.5Z" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2.4" stroke="currentColor" stroke-width="1.7" fill="none"/><path d="M8 10V7.8a4 4 0 0 1 8 0V10" stroke="currentColor" stroke-width="1.7" fill="none"/></symbol>
+  <symbol id="i-finder" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="3" stroke="currentColor" stroke-width="1.7" fill="none"/><path d="M12 4.5v15M8 9.5c.7 1 .7 2 0 3M16 9.5c-.7 1-.7 2 0 3" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-warning" viewBox="0 0 24 24"><path d="M12 4 2.8 20h18.4L12 4Z" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linejoin="round"/><path d="M12 9.5v4.5M12 17.2v.1" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+  <symbol id="i-terminal" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5" stroke="currentColor" stroke-width="1.7" fill="none"/><path d="m7.5 9.5 2.8 2.8-2.8 2.8M12.8 15.2h4" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="mark"><svg><use href="#i-spark"/></svg></span>
+    <span class="brand-text"><b>流光</b><i>WALLFLOW</i></span>
+  </div>
+
+  <div class="status-pills" id="statusPills"></div>
+
+  <div class="top-actions">
+    <button class="btn ghost sm" data-action="toggle-logs" title="运行日志">
+      <svg><use href="#i-terminal"/></svg><span>日志</span>
+    </button>
+    <button class="btn ghost sm" data-action="scan" title="扫描照片">
+      <svg><use href="#i-scan"/></svg><span>扫描照片</span>
+    </button>
+    <button class="btn primary sm" data-action="next" title="立即切到下一张（快捷键 N）">
+      <svg><use href="#i-shuffle"/></svg><span>下一张</span>
+    </button>
+  </div>
+  <div class="scanline" id="scanline" hidden><i></i></div>
+</header>
+
+<main class="page">
+  <section class="hero" id="hero">
+    <div class="hero-media" id="heroMedia">
+      <img id="heroImgA" alt="" />
+      <img id="heroImgB" alt="" />
+      <div class="hero-shade"></div>
+      <div class="hero-empty" id="heroEmpty">
+        <div class="orb"></div>
+        <p class="eyebrow">YOUR PHOTOS, REIMAGINED</p>
+        <h2>让你的照片<br/>成为此刻的风景</h2>
+        <p class="muted">本地选片 · 火山方舟风格化 · 桌面与锁屏轮播</p>
+        <button class="btn primary" data-action="scan"><svg><use href="#i-scan"/></svg><span>开始扫描照片</span></button>
+      </div>
+    </div>
+
+    <div class="hero-copy">
+      <div class="hero-chips" id="heroChips"></div>
+      <h1 id="heroTitle">此刻</h1>
+      <p id="heroSub" class="hero-sub">还没有正在播放的壁纸</p>
+    </div>
+
+    <aside class="hero-side" id="heroSide">
+      <div class="next-card">
+        <div class="next-head"><span>下一张</span><span class="mono" id="nextStyle">—</span></div>
+        <div class="next-thumb" id="nextThumb"><span>等待生成</span></div>
+        <div class="countdown">
+          <div class="ring" id="ring" style="--p:0"><span id="countdown">--:--</span></div>
+          <div class="countdown-meta">
+            <b id="rotationState">轮播中</b>
+            <small id="intervalLabel">每 30 分钟</small>
+          </div>
+        </div>
+        <div class="queue-line" id="queueLine">生成队列空闲</div>
+        <div class="hero-side-actions">
+          <button class="btn ghost sm" data-action="next" title="立即切到下一张"><svg><use href="#i-shuffle"/></svg><span>下一张</span></button>
+          <button class="btn ghost sm" data-action="rotation-toggle" id="rotationBtn"><svg><use href="#i-pause"/></svg><span>暂停轮播</span></button>
+          <button class="btn ghost sm" data-action="pipeline-toggle" id="pipelineBtn"><svg><use href="#i-play"/></svg><span>开始生成</span></button>
+        </div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="stats" id="stats"></section>
+
+  <nav class="tabs" id="tabs">
+    <button data-tab="gallery" class="active">画廊 <span id="tabGalleryCount">0</span></button>
+    <button data-tab="queue">队列 <span id="tabQueueCount">0</span></button>
+    <button data-tab="styles">风格</button>
+    <button data-tab="settings">设置</button>
+  </nav>
+
+  <section class="view" id="view"></section>
+</main>
+
+<div class="lightbox" id="lightbox" hidden>
+  <div class="lb-stage">
+    <div class="compare" id="compare">
+      <img id="lbOriginal" alt="原片" />
+      <div class="compare-top" id="compareTop"><img id="lbStyled" alt="成片" /></div>
+      <input type="range" min="0" max="100" value="55" id="compareRange" aria-label="对比原片与成片" />
+      <div class="compare-labels"><span>原片</span><span>成片</span></div>
+    </div>
+  </div>
+  <aside class="lb-side">
+    <button class="icon-btn close" data-action="close-lightbox" aria-label="关闭"><svg><use href="#i-x"/></svg></button>
+    <h3 id="lbTitle">—</h3>
+    <p class="muted" id="lbMeta">—</p>
+    <div class="lb-tags" id="lbTags"></div>
+    <div class="lb-actions">
+      <button class="btn primary" data-action="apply-current"><svg><use href="#i-check"/></svg><span>设为壁纸</span></button>
+      <button class="btn ghost" data-action="reveal"><svg><use href="#i-finder"/></svg><span>在 Finder 中显示</span></button>
+    </div>
+    <div class="lb-prompt">
+      <span class="eyebrow">PROMPT</span>
+      <p id="lbPrompt">—</p>
+    </div>
+    <div class="lb-nav">
+      <button class="btn ghost sm" data-action="lb-prev">← 上一张</button>
+      <button class="btn ghost sm" data-action="lb-next">下一张 →</button>
+    </div>
+  </aside>
+</div>
+
+<div class="logs" id="logs" hidden>
+  <div class="logs-head">
+    <span><svg><use href="#i-terminal"/></svg> 运行日志</span>
+    <button class="icon-btn" data-action="toggle-logs" aria-label="关闭"><svg><use href="#i-x"/></svg></button>
+  </div>
+  <div class="logs-body" id="logsBody"></div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script type="module" src="/app.js"></script>
+</body>
+</html>

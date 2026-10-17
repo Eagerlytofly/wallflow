@@ -1,0 +1,8 @@
+node_modules/
+data/
+config.json
+.secrets/*
+!.secrets/volcengine.env.example
+.build/
+*.log
+.DS_Store

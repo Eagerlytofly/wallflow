@@ -1,0 +1,46 @@
+{
+  "name": "wallflow",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "流光壁纸 · 本地照片 → 火山方舟风格化 → 桌面/锁屏随机轮播",
+  "bin": {
+    "wallflow": "./bin/wallflow.mjs"
+  },
+  "scripts": {
+    "start": "node bin/wallflow.mjs serve",
+    "dev": "node --watch bin/wallflow.mjs serve",
+    "scan": "node bin/wallflow.mjs scan",
+    "style": "node bin/wallflow.mjs style",
+    "next": "node bin/wallflow.mjs next",
+    "doctor": "node bin/wallflow.mjs doctor --probe",
+    "restore": "node bin/wallflow.mjs restore",
+    "test": "node --test test/*.test.mjs",
+    "unify": "node bin/wallflow.mjs unify"
+  },
+  "engines": {
+    "node": ">=20.11"
+  },
+  "dependencies": {
+    "exifr": "^7.1.3",
+    "sharp": "^0.34.2"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Eagerlytofly/wallflow.git"
+  },
+  "homepage": "https://github.com/Eagerlytofly/wallflow#readme",
+  "bugs": {
+    "url": "https://github.com/Eagerlytofly/wallflow/issues"
+  },
+  "keywords": [
+    "macos",
+    "wallpaper",
+    "ai",
+    "volcengine",
+    "seedream",
+    "risograph",
+    "screensaver",
+    "nodejs"
+  ]
+}

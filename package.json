@@ -1,6 +1,6 @@
 {
   "name": "wallflow",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "流光壁纸 · 本地照片 → 火山方舟风格化 → 桌面/锁屏随机轮播",
   "bin": {
@@ -15,7 +15,10 @@
     "doctor": "node bin/wallflow.mjs doctor --probe",
     "restore": "node bin/wallflow.mjs restore",
     "test": "node --test test/*.test.mjs",
-    "unify": "node bin/wallflow.mjs unify"
+    "unify": "node bin/wallflow.mjs unify",
+    "demo:scan": "WALLFLOW_CONFIG=demo/config.json WALLFLOW_DATA_DIR=demo-data node bin/wallflow.mjs scan",
+    "demo": "WALLFLOW_CONFIG=demo/config.json WALLFLOW_DATA_DIR=demo-data node bin/wallflow.mjs serve",
+    "demo:restore": "WALLFLOW_CONFIG=demo/config.json WALLFLOW_DATA_DIR=demo-data node bin/wallflow.mjs restore"
   },
   "engines": {
     "node": ">=20.11"

@@ -110,6 +110,24 @@ npm start
 
 ---
 
+## 无人物 Demo 数据集
+
+仓库自带 [demo/photos](demo/photos) —— **10 张没有人物**的照片（动物 4、风景 4、城市 2），
+来自作者自己的照片库，采用 [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) 授权，
+逐张来源见 [demo/credits.json](demo/credits.json)。
+
+不需要碰你的 `config.json` 和 `data/`，Demo 用独立配置和数据目录：
+
+```bash
+npm run demo:scan   # 只扫描 demo/photos，不调用模型、不花钱
+npm run demo        # http://127.0.0.1:7800
+```
+
+- 配置：`demo/config.json`（端口 7800，预算 ¥2）
+- 数据：`demo-data/`（gitignore）
+- 要生成成片仍然需要 `.secrets/volcengine.env`
+- 恢复演示前的壁纸：`npm run demo:restore`
+
 ## 工作原理
 
 ```
@@ -308,6 +326,9 @@ npm start                 # 控制台 + 轮播 + 生成队列（前台）
 npm run scan              # 扫描 & 选片
 npm run style -- --limit 8  # 命令行批量生成 8 张
 npm run next              # 立即切到下一张（轮播关闭时也有效）
+npm run demo:scan         # 扫描内置的无人物 Demo 数据（不调用 API）
+npm run demo              # 启动 Demo 实例（端口 7800）
+npm run demo:restore      # 恢复 Demo 前备份的壁纸
 npm run doctor            # 体检（含模型可用性探测）
 npm run restore           # 恢复原始桌面/锁屏
 
@@ -330,6 +351,10 @@ tail -f data/daemon.log
 ---
 
 ## 配置说明（config.json）
+
+> 可用环境变量 `WALLFLOW_CONFIG` 指定配置文件、`WALLFLOW_DATA_DIR` 指定数据目录；
+> `npm run demo*` 就是用这两个变量把 Demo 和主实例完全隔开的。
+
 
 | 字段 | 默认 | 说明 |
 | --- | --- | --- |
@@ -439,7 +464,9 @@ wallflow/
 │   ├── VisionAnalyze.swift   本地分析（分类/人脸/美感/显著性）
 │   └── Wallpaper.swift       Index.plist 读写 + WallpaperAgent 重启
 ├── web/                      控制台（无构建步骤，原生 ESM + SSE）
+├── demo/                     无人物示例数据集（CC BY 4.0）
 ├── data/                     运行时：state.json、缩略图、成片、备份（gitignore）
+├── demo-data/                Demo 运行时（gitignore）
 ├── test/                     单元测试
 └── docs/                     截图
 ```
@@ -453,6 +480,8 @@ wallflow/
   原始照片、EXIF、文件名都不会上传。
 - API Key 存在 `.secrets/volcengine.env`（已 gitignore，权限 600）。
 - 控制台只监听 `127.0.0.1`，没有对外端口。
+- 仓库里的 [demo/photos](demo/photos) 是 10 张**没有人物**的示例照片（CC BY 4.0），
+  不需要上传或使用你自己的照片就能试用。
 
 ---
 
@@ -468,4 +497,7 @@ wallflow/
 
 ## License
 
-MIT. 见 [LICENSE](LICENSE)。
+代码采用 **MIT**，见 [LICENSE](LICENSE)。
+
+`demo/photos` 下的 10 张示例照片单独采用 **CC BY 4.0**，署名与逐张来源见
+[demo/credits.json](demo/credits.json)。

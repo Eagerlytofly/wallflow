@@ -1,0 +1,79 @@
+{
+  "roots": [
+    "demo/photos"
+  ],
+  "scan": {
+    "maxFiles": 20,
+    "includeRaw": false,
+    "minMegapixels": 1.2,
+    "minWidth": 1200,
+    "concurrency": 3,
+    "skipScreenshots": true,
+    "excludeDirs": [
+      ".photoslibrary",
+      ".thumbnails",
+      "cache",
+      "node_modules",
+      ".git",
+      "Lightroom Catalog"
+    ]
+  },
+  "output": {
+    "width": 3840,
+    "height": 2160,
+    "quality": 92
+  },
+  "selection": {
+    "count": 10,
+    "minScore": 0.42,
+    "maxPerTagOverlap": 0.55,
+    "quotas": {
+      "person": 16,
+      "animal": 16,
+      "landscape": 16,
+      "urban": 8
+    }
+  },
+  "ark": {
+    "region": "cn-beijing",
+    "model": "doubao-seedream-4-0-20260415",
+    "fallbackModels": [
+      "doubao-seedream-5-0-pro-260628",
+      "doubao-seedream-5-0-flash-260915"
+    ],
+    "size": "2560x1440",
+    "concurrency": 2,
+    "timeoutSec": 180,
+    "retries": 2,
+    "priceCents": 20,
+    "dailyBudgetCents": 200,
+    "apiKeyFile": ".secrets/volcengine.env"
+  },
+  "styles": {
+    "enabled": [
+      "watercolor",
+      "ghibli",
+      "oil",
+      "ink",
+      "film",
+      "riso",
+      "ukiyoe",
+      "minimal"
+    ],
+    "perPhoto": 1,
+    "custom": {}
+  },
+  "rotation": {
+    "applyOnStart": true,
+    "notify": false,
+    "intervalSeconds": 10
+  },
+  "wallpaper": {
+    "placement": 1,
+    "lockScreenMode": "on-lock"
+  },
+  "server": {
+    "port": 7800,
+    "host": "127.0.0.1"
+  }
+}

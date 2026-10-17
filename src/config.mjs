@@ -4,8 +4,12 @@ import { fileURLToPath } from 'node:url';
 import { deepMerge, readJsonSync, writeJsonAtomic, ensureDirSync } from './util.mjs';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-export const CONFIG_PATH = path.join(ROOT, 'config.json');
-export const DATA_DIR = path.join(ROOT, 'data');
+export const CONFIG_PATH = process.env.WALLFLOW_CONFIG
+  ? path.resolve(ROOT, process.env.WALLFLOW_CONFIG)
+  : path.join(ROOT, 'config.json');
+export const DATA_DIR = process.env.WALLFLOW_DATA_DIR
+  ? path.resolve(ROOT, process.env.WALLFLOW_DATA_DIR)
+  : path.join(ROOT, 'data');
 export const STATE_PATH = path.join(DATA_DIR, 'state.json');
 export const THUMBS_DIR = path.join(DATA_DIR, 'thumbs');
 export const PREVIEWS_DIR = path.join(DATA_DIR, 'previews');

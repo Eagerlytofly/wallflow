@@ -1,6 +1,8 @@
 node_modules/
 data/
+demo-data/
 config.json
+!demo/config.json
 .secrets/*
 !.secrets/volcengine.env.example
 .build/

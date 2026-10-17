@@ -1,0 +1,88 @@
+{
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "credit": "Wallflow contributors",
+  "note": "Ten non-person photos selected from the author's own library for the demo dataset.",
+  "items": [
+    {
+      "file": "animal-heron.jpg",
+      "title": "夜鹭",
+      "category": "animal",
+      "original": "P6240007.JPG",
+      "author": "Wallflow contributors",
+      "license": "CC BY 4.0"
+    },
+    {
+      "file": "animal-giraffe.jpg",
+      "title": "长颈鹿",
+      "category": "animal",
+      "original": "P8080929.jpg",
+      "author": "Wallflow contributors",
+      "license": "CC BY 4.0"
+    },
+    {
+      "file": "animal-warthog.jpg",
+      "title": "荒野动物",
+      "category": "animal",
+      "original": "P8080706.jpg",
+      "author": "Wallflow contributors",
+      "license": "CC BY 4.0"
+    },
+    {
+      "file": "animal-birds.jpg",
+      "title": "两只鸟",
+      "category": "animal",
+      "original": "P8080839.jpg",
+      "author": "Wallflow contributors",
+      "license": "CC BY 4.0"
+    },
+    {
+      "file": "landscape-lake.jpg",
+      "title": "高原湖泊",
+      "category": "landscape",
+      "original": "saibei1.jpg",
+      "author": "Wallflow contributors",
+      "license": "CC BY 4.0"
+    },
+    {
+      "file": "landscape-grassland.jpg",
+      "title": "草原",
+      "category": "landscape",
+      "original": "P8080599.jpg",
+      "author": "Wallflow contributors",
+      "license": "CC BY 4.0"
+    },
+    {
+      "file": "landscape-wetland.jpg",
+      "title": "湿地",
+      "category": "landscape",
+      "original": "DSCF3834.JPG",
+      "author": "Wallflow contributors",
+      "license": "CC BY 4.0"
+    },
+    {
+      "file": "landscape-fields.jpg",
+      "title": "田野",
+      "category": "landscape",
+      "original": "DSCF3898.JPG",
+      "author": "Wallflow contributors",
+      "license": "CC BY 4.0"
+    },
+    {
+      "file": "urban-night.jpg",
+      "title": "夜色老街",
+      "category": "urban",
+      "original": "DSCF3750.JPG",
+      "author": "Wallflow contributors",
+      "license": "CC BY 4.0"
+    },
+    {
+      "file": "urban-cafe.jpg",
+      "title": "咖啡馆一角",
+      "category": "urban",
+      "original": "coffee2.jpg",
+      "author": "Wallflow contributors",
+      "license": "CC BY 4.0"
+    }
+  ]
+}

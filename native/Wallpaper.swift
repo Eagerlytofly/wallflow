@@ -173,12 +173,13 @@ func screenSaverUnifiedEnabled() -> Bool {
 
 func setUnified(_ enabled: Bool) {
     let domain = "com.apple.wallpaper" as CFString
-    for key in [
-        "useAsDesktopWallpaperAndIdleWallpaper",
-        "useAsDesktopWallpaperAndScreenSaverWallpaper",
-    ] {
-        CFPreferencesSetAppValue(key as CFString, (enabled ? kCFBooleanTrue : kCFBooleanFalse), domain)
-    }
+    // Link desktop + lock screen. Do NOT link the screen saver: macOS turns
+    // that into a dynamic/linked wallpaper and then ignores still-image
+    // writes from WallpaperAgent.
+    CFPreferencesSetAppValue("useAsDesktopWallpaperAndIdleWallpaper" as CFString,
+                             (enabled ? kCFBooleanTrue : kCFBooleanFalse), domain)
+    CFPreferencesSetAppValue("useAsDesktopWallpaperAndScreenSaverWallpaper" as CFString,
+                             kCFBooleanFalse, domain)
     CFPreferencesAppSynchronize(domain)
 }
 

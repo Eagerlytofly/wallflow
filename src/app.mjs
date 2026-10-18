@@ -493,11 +493,8 @@ export async function createApp({ logger, autoStart = true } = {}) {
     try {
       const cur = await wallpaper.current();
       const target = cur.idle?.[0] ? decodeURIComponent(cur.idle[0]).replace('file://', '') : '';
-      const linked = cur.unified && cur.screenSaverUnified;
-      const label = linked
-        ? '桌面、锁屏与屏保已联动'
-        : cur.unified
-          ? '桌面与锁屏已联动（屏保未联动）'
+      const label = cur.unified
+        ? '桌面与锁屏已联动（屏保未联动）'
           : '锁屏/屏保独立';
       push('wallpaper', true, `${label}${target ? ` · ${target}` : ''}`);
     } catch (err) {
@@ -556,9 +553,9 @@ export async function createApp({ logger, autoStart = true } = {}) {
   await wallpaper.warmup().catch((err) => logger.warn(`壁纸 helper 预启动失败：${err.message}`));
   if (config.wallpaper.lockScreenMode !== 'off') {
     const session = await wallpaper.sessionState().catch(() => null);
-    if (session && (!session.unified || !session.screenSaverUnified)) {
-      await wallpaper.setUnified(true).catch((err) => logger.warn(`开启桌面/锁屏/屏保联动失败：${err.message}`));
-      logger.info('已开启 macOS「桌面、锁屏与屏保使用同一张壁纸」');
+    if (session && !session.unified) {
+      await wallpaper.setUnified(true).catch((err) => logger.warn(`开启桌面/锁屏联动失败：${err.message}`));
+      logger.info('已开启 macOS「桌面与锁屏使用同一张壁纸」');
     }
   }
   await refreshScreenInfo().catch(() => {});

@@ -244,6 +244,10 @@ export function createWebServer(ctx) {
       if (pathname === '/api/pipeline/start' && req.method === 'POST') {
         return sendJson(res, 200, await ctx.actions.startPipeline());
       }
+      if (pathname === '/api/pipeline/variants' && req.method === 'POST') {
+        const body = await readBody(req);
+        return sendJson(res, 200, await ctx.actions.generateVariants(body.count ?? 4));
+      }
       if (pathname === '/api/pipeline/pause' && req.method === 'POST') {
         return sendJson(res, 200, ctx.actions.pausePipeline());
       }

@@ -257,8 +257,56 @@ export async function createApp({ logger, autoStart = true } = {}) {
   async function startPipeline() {
     if (!pipeline.ark) throw new Error('还没有可用的火山方舟 API Key，无法生成');
     const added = pipeline.enqueue(pipeline.plan());
+    if (!added && !pipeline.queue.length) {
+      logger.info('没有待生成任务：选片都已有当前风格的成片');
+      return { added: 0, reason: 'all-covered', ...pipeline.status() };
+    }
     pipeline.start({ replan: false });
     return { added, ...pipeline.status() };
+  }
+
+  async function generateVariants(count = 4) {
+    if (!pipeline.ark) throw new Error('还没有可用的火山方舟 API Key，无法生成');
+    const enabled = config.styles.enabled.filter((id) => styleById(id));
+    if (!enabled.length) throw new Error('没有启用任何风格');
+    const limit = Math.max(1, Math.min(12, Math.round(Number(count) || 4)));
+    const doneByPhoto = new Map();
+    for (const render of store.renderList()) {
+      if (render.status !== 'done') continue;
+      if (!doneByPhoto.has(render.photoId)) doneByPhoto.set(render.photoId, new Set());
+      doneByPhoto.get(render.photoId).add(render.styleId);
+    }
+    const candidates = store.photoList()
+      .filter((photo) => photo.selected)
+      .sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))
+      .map((photo) => {
+        const done = doneByPhoto.get(photo.id) ?? new Set();
+        return {
+          photo,
+          done: done.size,
+          unused: enabled.filter((id) => !done.has(id)),
+        };
+      })
+      .filter((entry) => entry.unused.length)
+      .sort((a, b) => a.done - b.done)
+      .slice(0, limit);
+    if (!candidates.length) {
+      throw new Error('所有选片都已有全部启用风格的成片；请启用新风格或增加选片');
+    }
+    const chosenIds = new Set();
+    for (const entry of candidates) {
+      const style = entry.unused[0];
+      store.putPhoto({ ...entry.photo, styles: [style] });
+      chosenIds.add(entry.photo.id);
+    }
+    await store.flush();
+    const jobs = pipeline.plan().filter((job) => chosenIds.has(job.photoId));
+    const added = pipeline.enqueue(jobs);
+    if (added) pipeline.start({ replan: false });
+    const estimateCents = added * (Number(config.ark.priceCents) || 0);
+    logger.info(`换风格生成：加入 ${added} 张（预计 ¥${(estimateCents / 100).toFixed(2)}）`);
+    bus.emit('invalidate', { type: 'variants', added });
+    return { added, estimateCents, ...pipeline.status() };
   }
 
   async function state() {
@@ -591,6 +639,7 @@ export async function createApp({ logger, autoStart = true } = {}) {
       updateSettings,
       updateStyles,
       startPipeline,
+      generateVariants,
       startRotation: async () => {
         await scheduler.start({ applyNow: !store.runtime.current });
         return scheduler.enabled;

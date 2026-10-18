@@ -385,6 +385,7 @@ function renderHeroEmpty() {
         ${d.rotation.enabled
           ? `<button class="btn primary" data-action="next"><svg><use href="#i-shuffle"/></svg><span>下一张</span></button>`
           : `<button class="btn primary" data-action="rotation-toggle"><svg><use href="#i-play"/></svg><span>继续轮播</span></button>`}
+        <button class="btn ghost" data-action="generate-variants"><svg><use href="#i-spark"/></svg><span>换 4 张新风格</span></button>
         <button class="btn ghost" data-action="scan"><svg><use href="#i-scan"/></svg><span>重新扫描</span></button>
       </div>
       <div class="hero-steps"><span><b>桌面</b> 已接管</span><span><b>锁屏</b> ${lockModeLabel(state.data.config.wallpaper.lockScreenMode)}</span></div>`,
@@ -545,6 +546,7 @@ function queueShell() {
       <div class="panel-head">
         <h3>正在生成</h3>
         <div style="display:flex;gap:8px">
+          <button class="btn ghost sm" data-action="generate-variants" title="用还没试过的风格生成 4 张新成片"><svg><use href="#i-spark"/></svg><span>换 4 张新风格</span></button>
           <button class="btn ghost sm" data-action="retry"><svg><use href="#i-refresh"/></svg><span>重试失败</span></button>
           <button class="btn ghost sm" data-action="pipeline-toggle" id="queuePipelineBtn"></button>
         </div>
@@ -1031,9 +1033,32 @@ const actions = {
   },
   async 'pipeline-toggle'() {
     const running = state.data?.pipeline.running;
-    await api(running ? '/api/pipeline/pause' : '/api/pipeline/start', { method: 'POST' });
-    toast(running ? '生成已暂停（进行中的会完成）' : '生成队列已启动', 'ok');
+    if (running) {
+      await api('/api/pipeline/pause', { method: 'POST' });
+      toast('生成已暂停（进行中的会完成）', 'ok');
+    } else {
+      const res = await api('/api/pipeline/start', { method: 'POST' });
+      if (!res.added) {
+        toast('当前选片都已有当前风格的成片；点「换 4 张新风格」或增加选片', 'err');
+      } else {
+        toast(`已加入 ${res.added} 张生成任务`, 'ok');
+      }
+    }
     refreshState();
+  },
+  async 'generate-variants'() {
+    const res = await api('/api/pipeline/variants', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ count: 4 }),
+    });
+    if (!res.added) {
+      toast('没有可用风格：所有选片都已试过全部启用风格', 'err');
+    } else {
+      toast(`已加入 ${res.added} 张新风格任务（预计 ¥${(res.estimateCents / 100).toFixed(2)}）`, 'ok');
+    }
+    await refreshState();
+    if (state.tab === 'queue') await loadRenders();
   },
   async retry() {
     const res = await api('/api/retry', { method: 'POST' });

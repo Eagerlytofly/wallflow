@@ -35,7 +35,9 @@ export class Scheduler {
 
   get intervalSeconds() {
     const value = Number(this.config.rotation.intervalSeconds);
-    return Number.isFinite(value) ? Math.max(0, value) : 1800;
+    if (!Number.isFinite(value)) return 0;
+    if (value <= 0) return 0;
+    return Math.max(30, value);
   }
 
   get intervalMs() {

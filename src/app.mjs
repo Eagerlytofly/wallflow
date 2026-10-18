@@ -14,6 +14,7 @@ import {
   ensureDirs,
   loadConfig,
   saveConfig,
+  normalizeIntervalSeconds,
 } from './config.mjs';
 import { Store } from './store.mjs';
 import { Wallpaper, WallpaperError } from './wallpaper.mjs';
@@ -197,8 +198,7 @@ export async function createApp({ logger, autoStart = true } = {}) {
     if (rawInterval === '' || rawInterval == null) {
       next.rotation.intervalSeconds = prevInterval;
     } else {
-      const interval = Number(rawInterval);
-      next.rotation.intervalSeconds = Number.isFinite(interval) ? Math.max(0, Math.round(interval)) : prevInterval;
+      next.rotation.intervalSeconds = normalizeIntervalSeconds(rawInterval, prevInterval);
     }
     next.output.width = Math.max(1280, Number(next.output.width) || 3840);
     next.output.height = Math.max(720, Number(next.output.height) || 2160);

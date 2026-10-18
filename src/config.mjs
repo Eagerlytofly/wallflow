@@ -20,6 +20,15 @@ export const BACKUP_DIR = path.join(DATA_DIR, 'wallpaper');
 export const WEB_DIR = path.join(ROOT, 'web');
 export const SECRETS_DIR = path.join(ROOT, '.secrets');
 
+export const MIN_INTERVAL_SECONDS = 30;
+
+export function normalizeIntervalSeconds(value, fallback = 0) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return fallback;
+  if (n <= 0) return 0;
+  return Math.max(MIN_INTERVAL_SECONDS, Math.round(n));
+}
+
 export const DEFAULT_CONFIG = {
   roots: [path.join(os.homedir(), 'Pictures')],
   scan: {
@@ -60,7 +69,7 @@ export const DEFAULT_CONFIG = {
     custom: {}, // { styleId: "custom prompt" }
   },
   rotation: {
-    intervalSeconds: 1800,
+    intervalSeconds: 0,
     applyOnStart: true,
     notify: false,
   },
@@ -83,7 +92,7 @@ export function loadConfig() {
 
   // Migrate the pre-0.2 shape (minutes / boolean lock screen).
   if (raw?.rotation?.intervalMinutes != null && raw?.rotation?.intervalSeconds == null) {
-    merged.rotation.intervalSeconds = Math.round(Number(raw.rotation.intervalMinutes) * 60);
+    merged.rotation.intervalSeconds = normalizeIntervalSeconds(Number(raw.rotation.intervalMinutes) * 60);
   }
   if (raw?.wallpaper?.setLockScreen != null && raw?.wallpaper?.lockScreenMode == null) {
     merged.wallpaper.lockScreenMode = raw.wallpaper.setLockScreen ? 'on-lock' : 'off';
@@ -91,8 +100,7 @@ export function loadConfig() {
   delete merged.rotation.intervalMinutes;
   delete merged.wallpaper.setLockScreen;
 
-  const interval = Number(merged.rotation.intervalSeconds);
-  merged.rotation.intervalSeconds = Number.isFinite(interval) ? Math.max(0, interval) : 1800;
+  merged.rotation.intervalSeconds = normalizeIntervalSeconds(merged.rotation.intervalSeconds, 0);
   if (!['on-lock', 'each', 'off'].includes(merged.wallpaper.lockScreenMode)) {
     merged.wallpaper.lockScreenMode = 'on-lock';
   }

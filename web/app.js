@@ -256,7 +256,7 @@ function renderStatus() {
     if (d.rotation.intervalSeconds === 0) {
       rotationBtn.innerHTML = `<svg><use href="#i-play"/></svg><span>开启轮播</span>`;
       rotationBtn.disabled = false;
-      rotationBtn.title = '开启 10 秒自动轮播';
+      rotationBtn.title = '开启 30 秒自动轮播';
     } else {
       rotationBtn.innerHTML = d.rotation.enabled
         ? `<svg><use href="#i-pause"/></svg><span>暂停轮播</span>`
@@ -733,7 +733,7 @@ function settingsShell() {
   view.innerHTML = `
     ${!state.data.ark.hasKey ? `<div class="notice"><svg><use href="#i-warning"/></svg><div>还没有配置火山方舟 API Key。把密钥写进 <span class="mono">${esc(state.data.app.root)}/.secrets/volcengine.env</span>（变量名 <span class="mono">ARK_API_KEY</span>），或设置同名环境变量后重启。</div></div>` : ''}
     <form id="settingsForm" class="settings-grid">
-      ${c.rotation.intervalSeconds === 0 ? `<div class="notice" style="grid-column:1/-1"><svg><use href="#i-warning"/></svg><div>自动轮播已关闭（间隔 0）。<button type="button" class="btn ghost sm" data-action="enable-rotation" style="margin-left:10px">开启 10 秒轮播</button></div></div>` : ''}
+      ${c.rotation.intervalSeconds === 0 ? `<div class="notice" style="grid-column:1/-1"><svg><use href="#i-warning"/></svg><div>自动轮播已关闭（间隔 0）。<button type="button" class="btn ghost sm" data-action="enable-rotation" style="margin-left:10px">开启 30 秒轮播</button></div></div>` : ''}
       <div class="panel">
         <div class="panel-head"><h3>照片与选片</h3><span class="hint">本地 Vision 分析，不上传</span></div>
         <div class="field">
@@ -796,7 +796,7 @@ function settingsShell() {
       <div class="panel">
         <div class="panel-head"><h3>轮播</h3><span class="hint">播放与生成并行</span></div>
         <div class="field two">
-          <div><label>间隔 <small>秒，0 = 关闭自动轮播</small></label><input type="number" step="1" name="interval" min="0" value="${c.rotation.intervalSeconds}" /></div>
+          <div><label>间隔 <small>秒，0 = 关闭；开启至少 30 秒</small></label><input type="number" step="1" name="interval" min="0" value="${c.rotation.intervalSeconds}" /></div>
           <div><label>缩放方式</label>
             <select name="placement">
               ${[[1, '填充屏幕'], [2, '适应屏幕'], [3, '拉伸'], [4, '居中'], [5, '平铺']].map(([v, label]) => `<option value="${v}" ${c.wallpaper.placement === v ? 'selected' : ''}>${label}</option>`).join('')}
@@ -804,7 +804,7 @@ function settingsShell() {
           </div>
         </div>
         <div class="quick-row" id="quickIntervals">
-          ${[[0, '关闭轮播'], [10, '10 秒'], [30, '30 秒'], [60, '1 分钟'], [300, '5 分钟'], [1800, '30 分钟']]
+          ${[[0, '关闭轮播'], [30, '30 秒'], [60, '1 分钟'], [300, '5 分钟'], [1800, '30 分钟']]
             .map(([v, label]) => `<button type="button" class="btn ghost sm" data-quick="${v}">${label}</button>`).join('')}
         </div>
         <div class="field row">
@@ -992,9 +992,9 @@ async function enableRotation() {
   await api('/api/settings', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ rotation: { intervalSeconds: 10 } }),
+    body: JSON.stringify({ rotation: { intervalSeconds: 30 } }),
   });
-  toast('已开启自动轮播（10 秒一张）', 'ok');
+  toast('已开启自动轮播（30 秒一张）', 'ok');
   await refreshState();
   if (state.tab === 'settings') settingsShell();
 }

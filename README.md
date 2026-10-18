@@ -105,7 +105,7 @@ npm start
 
 1. 点右上角 **开始生成**（或英雄区「开始生成第一张」）；
 2. 第一张成片完成后自动成为桌面 + 锁屏壁纸；
-3. 之后按设定间隔换一张（默认 30 分钟，可调到 10 秒；设为 0 则关闭自动轮播）；
+3. 默认不自动轮播；需要时设 30 秒或更长的间隔，设为 0 则关闭；
 4. 随时可以「下一张」（快捷键 `N`）「暂停轮播」「暂停生成」，互不影响。
 
 ---
@@ -212,7 +212,7 @@ dHash 距离 ≤5 视为连拍/重复，只保留分高的一张。
 
 ---
 
-## 换壁纸：10 秒一张，而且不闪
+## 换壁纸：30 秒起一张，而且不闪
 
 macOS 有两条完全不同的换壁纸通道，本项目两条都用：
 
@@ -242,7 +242,7 @@ defaults read com.apple.wallpaper useAsDesktopWallpaperAndIdleWallpaper
 
 轮播流程：
 
-1. 每 N 秒用 `NSWorkspace` 换桌面（默认 10 秒，最小 5 秒）；
+1. 每 N 秒用 `NSWorkspace` 换桌面（默认关闭自动轮播；开启时最小 30 秒）；
 2. 同时把同一张图写进 `Idle`（不重启 agent），保证锁屏配置与桌面一致；
 3. 检测到屏幕锁定/休眠时暂停轮播，并在**锁定瞬间**重启一次 WallpaperAgent，
    让锁屏重新读取最新 `Idle`——这一下闪烁发生在锁屏过程中；
@@ -270,7 +270,7 @@ defaults read com.apple.wallpaper useAsDesktopWallpaperAndIdleWallpaper
 
 | 模式 | 行为 | 适合 |
 | --- | --- | --- |
-| `on-lock`（默认） | 桌面与锁屏联动，锁定时读取最新桌面 | 10 秒级快速轮播 |
+| `on-lock`（默认） | 桌面与锁屏联动，锁定时读取最新桌面 | 30 秒级快速轮播 |
 | `each` | 每次换壁纸都重启 agent 同步锁屏 | 调试/慢轮播（短间隔会闪） |
 | `off` | 只换桌面，锁屏保持原样 | 不想动锁屏 |
 
@@ -311,8 +311,8 @@ defaults read com.apple.wallpaper useAsDesktopWallpaperAndScreenSaverWallpaper
 打开后：
 
 - 每次屏保启动时，取**当前桌面壁纸**作为屏保画面；
-- 桌面每 10 秒轮播，所以每次进屏保看到的 AI 成片会不同；
-- 屏保**运行期间**不会每 10 秒跳一张——系统只在启动时取一次画面。要做到这一点需要
+- 桌面每 30 秒轮播，所以每次进屏保看到的 AI 成片会不同；
+- 屏保**运行期间**不会每 30 秒跳一张——系统只在启动时取一次画面。要做到这一点需要
   自建视频壁纸扩展（类似 Aerial 4），属于后续工作，不是改 plist 能解决的；
 - 如果你的屏保仍然是固定的 Aerial 风景，到「系统设置 → 屏保」里选择「当前壁纸/随机」，
   或关掉屏保；`npm run doctor` 会显示桌面/锁屏/屏保的联动状态。
@@ -375,7 +375,7 @@ tail -f data/daemon.log
 | `ark.priceCents` | 20 | 单张估算成本（分），只用于预算 |
 | `ark.dailyBudgetCents` | 800 | 每日预算（分），到点自动暂停 |
 | `output.width/height` | 3840×2160 | 最终壁纸分辨率（从模型输出 Lanczos 放大） |
-| `rotation.intervalSeconds` | 1800 | 轮播间隔（秒）；0 = 关闭自动轮播，只用「下一张」手动切换 |
+| `rotation.intervalSeconds` | 0 | 轮播间隔（秒）；0 = 默认关闭自动轮播；开启时最小 30 秒 |
 | `rotation.applyOnStart` | true | 启动后是否立即应用第一张 |
 | `wallpaper.lockScreenMode` | on-lock | on-lock 锁屏时同步 / each 每次都同步（会闪）/ off 仅桌面 |
 | `wallpaper.placement` | 1 | 0 自动 / 1 填充 / 2 适应 / 3 拉伸 / 4 居中 / 5 平铺 |
@@ -417,10 +417,10 @@ npm run doctor
 | --- | --- |
 | 扫描 0 张 | 目录未挂载 / 扩展名不支持 / `scan.maxFiles` 太小；看日志 |
 | 全部「无法解码」 | 空文件或损坏文件；本工具已跳过 <1KB，仍失败会打印文件名 |
-| 首次启动很慢 | 正在 `swiftc` 编译两个原生小工具（约 5-10 秒，之后复用） |
+| 首次启动很慢 | 正在 `swiftc` 编译两个原生小工具（约 5-30 秒，之后复用） |
 | 锁屏没变 | 默认只在锁屏时同步；想每次都变把 `lockScreenMode` 改成 `each`；并检查完全磁盘访问权限 |
 | 桌面没变 | 快速通道失败会回退到 plist 方式；看日志与 `wallflow doctor` |
-| 10 秒一张会闪 | 锁屏同步模式改回 `on-lock`（默认），不要用 `each` |
+| 30 秒起一张会闪 | 锁屏同步模式改回 `on-lock`（默认），不要用 `each` |
 | 模型报 404 | 用 `doctor --probe` 确认模型是否开通；换 `fallbackModels` 里的模型 |
 | 生成很慢 / 429 | 把 `ark.concurrency` 调到 1，或换 `seedream-5-0-flash` |
 | 人物变脸 | 降低风格强度/换「胶片」这类轻风格；提示词已要求保留面部，但模型仍有随机性 |

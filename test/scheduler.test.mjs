@@ -113,6 +113,6 @@ test('interval 0 means manual mode, positive values pass through', async () => {
   assert.equal(manual.store.runtime.current.nextAt, null);
 
   const fast = makeScheduler({ intervalSeconds: 1 });
-  assert.equal(fast.scheduler.intervalSeconds, 1);
-  assert.equal(fast.scheduler.intervalMs, 1000);
+  assert.equal(fast.scheduler.intervalSeconds, 30);
+  assert.equal(fast.scheduler.intervalMs, 30_000);
 });

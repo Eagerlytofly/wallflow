@@ -66,7 +66,7 @@
   "rotation": {
     "applyOnStart": true,
     "notify": false,
-    "intervalSeconds": 10
+    "intervalSeconds": 30
   },
   "wallpaper": {
     "placement": 1,

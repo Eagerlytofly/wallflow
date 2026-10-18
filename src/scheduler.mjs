@@ -22,6 +22,8 @@ export class Scheduler {
     this.onUpdate = onUpdate ?? (() => {});
     this.timer = null;
     this.lockTimer = null;
+    this.healthTimer = null;
+    this.lastHealthWarn = 0;
     this.enabled = false;
     this.ticking = null;
     this.screenInactive = false;
@@ -109,6 +111,7 @@ export class Scheduler {
     this.lockTimer = setInterval(() => {
       this.pollScreen().catch((err) => this.logger?.debug(`屏幕状态检查失败：${err.message}`));
     }, 2500);
+    this.healthTimer = setInterval(() => this.checkHealth(), 10_000);
     this.lockTimer.unref?.();
     this.pollScreen().catch(() => {});
   }
@@ -117,6 +120,35 @@ export class Scheduler {
     if (this.lockTimer) {
       clearInterval(this.lockTimer);
       this.lockTimer = null;
+    }
+    if (this.healthTimer) {
+      clearInterval(this.healthTimer);
+      this.healthTimer = null;
+    }
+  }
+
+  /** Recover a timer that was lost while the Mac slept or the screen locked. */
+  checkHealth() {
+    if (!this.enabled || this.intervalSeconds <= 0 || this.screenInactive || this.ticking) return;
+    const current = this.store.runtime.current;
+    if (!current) {
+      if (!this.timer) this.scheduleNext(1000);
+      return;
+    }
+    const applied = Date.parse(current.appliedAt);
+    if (!Number.isFinite(applied)) return;
+    const due = applied + this.intervalMs;
+    const overdue = Date.now() - due;
+    if (!this.timer || overdue > Math.max(this.intervalMs, 10_000)) {
+      if (Date.now() - this.lastHealthWarn > 60_000) {
+        this.lastHealthWarn = Date.now();
+        this.logger?.warn(`轮播计时器未按计划运行，自动恢复（延迟 ${Math.round(overdue / 1000)} 秒）`);
+      }
+      if (overdue > 0) {
+        this.tick({ reason: 'watchdog' }).catch((err) => this.logger?.warn(`自动恢复失败：${err.message}`));
+      } else {
+        this.scheduleNext(Math.max(1000, due - Date.now()));
+      }
     }
   }
 
@@ -191,7 +223,11 @@ export class Scheduler {
   async tick({ reason = 'timer', force = false } = {}) {
     if (!force && !this.enabled) return null;
     if (!force && this.screenInactive) return null;
-    if (this.ticking) return this.ticking;
+    if (this.ticking) {
+      if (!force) return this.ticking;
+      // A manual "next" must not be swallowed by an in-flight timer tick.
+      await this.ticking.catch(() => {});
+    }
     this.ticking = (async () => {
       const ready = this.readyKeys();
       if (!ready.length) {
@@ -239,13 +275,30 @@ export class Scheduler {
 
       // Persist the choice (Desktop + Idle) without restarting the agent.
       // It becomes visible on the lock screen at the next lock transition.
+      // WallpaperAgent can race the NSWorkspace update and rewrite the store
+      // with a Desktop-only choice; verify Idle survived and write it again.
       const mode = this.lockMode;
       if (mode !== 'off') {
-        await this.wallpaper.storeChoice(file, {
-          lock: true,
-          placement: this.config.wallpaper.placement ?? 1,
-          restart: mode === 'each' || this.screenInactive,
-        });
+        const placement = this.config.wallpaper.placement ?? 1;
+        const restart = mode === 'each' || this.screenInactive;
+        const expected = path.basename(file);
+        const writeChoice = () => this.wallpaper.storeChoice(file, { lock: true, placement, restart });
+        const idleMatches = async () => {
+          if (typeof this.wallpaper.current !== 'function') return true;
+          const info = await this.wallpaper.current().catch(() => null);
+          return (info?.idle ?? []).some((url) => url.endsWith(expected));
+        };
+        // Give WallpaperAgent a beat to finish its own NSWorkspace update;
+        // writing the store in the same tick is often overwritten.
+        await new Promise((resolve) => setTimeout(resolve, 700));
+        await writeChoice();
+        if (!(await idleMatches())) {
+          await new Promise((resolve) => setTimeout(resolve, 700));
+          await writeChoice();
+          if (!(await idleMatches())) {
+            this.logger?.warn('锁屏壁纸写入未生效，稍后会再次同步');
+          }
+        }
       }
 
       const appliedAt = new Date();

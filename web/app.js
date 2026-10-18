@@ -254,8 +254,9 @@ function renderStatus() {
   const rotationBtn = $('#rotationBtn');
   if (rotationBtn) {
     if (d.rotation.intervalSeconds === 0) {
-      rotationBtn.innerHTML = `<svg><use href="#i-clock"/></svg><span>手动模式</span>`;
-      rotationBtn.disabled = true;
+      rotationBtn.innerHTML = `<svg><use href="#i-play"/></svg><span>开启轮播</span>`;
+      rotationBtn.disabled = false;
+      rotationBtn.title = '开启 10 秒自动轮播';
     } else {
       rotationBtn.innerHTML = d.rotation.enabled
         ? `<svg><use href="#i-pause"/></svg><span>暂停轮播</span>`
@@ -732,6 +733,7 @@ function settingsShell() {
   view.innerHTML = `
     ${!state.data.ark.hasKey ? `<div class="notice"><svg><use href="#i-warning"/></svg><div>还没有配置火山方舟 API Key。把密钥写进 <span class="mono">${esc(state.data.app.root)}/.secrets/volcengine.env</span>（变量名 <span class="mono">ARK_API_KEY</span>），或设置同名环境变量后重启。</div></div>` : ''}
     <form id="settingsForm" class="settings-grid">
+      ${c.rotation.intervalSeconds === 0 ? `<div class="notice" style="grid-column:1/-1"><svg><use href="#i-warning"/></svg><div>自动轮播已关闭（间隔 0）。<button type="button" class="btn ghost sm" data-action="enable-rotation" style="margin-left:10px">开启 10 秒轮播</button></div></div>` : ''}
       <div class="panel">
         <div class="panel-head"><h3>照片与选片</h3><span class="hint">本地 Vision 分析，不上传</span></div>
         <div class="field">
@@ -871,7 +873,11 @@ async function onSettingsSubmit(event) {
     },
     output: { width: Number(fd.get('outW')), height: Number(fd.get('outH')) },
     wallpaper: { lockScreenMode: String(fd.get('lockMode') || 'on-lock'), placement: Number(fd.get('placement')) },
-    rotation: { notify: fd.get('notify') === 'on', intervalSeconds: Number(fd.get('interval')), applyOnStart: fd.get('applyOnStart') === 'on' },
+    rotation: {
+      notify: fd.get('notify') === 'on',
+      intervalSeconds: fd.get('interval') === '' ? state.data.rotation.intervalSeconds : Number(fd.get('interval')),
+      applyOnStart: fd.get('applyOnStart') === 'on',
+    },
   };
   await act(async () => {
     await api('/api/settings', {
@@ -982,6 +988,17 @@ function renderLogs(entries) {
 
 /* ---------------- actions ---------------- */
 
+async function enableRotation() {
+  await api('/api/settings', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ rotation: { intervalSeconds: 10 } }),
+  });
+  toast('已开启自动轮播（10 秒一张）', 'ok');
+  await refreshState();
+  if (state.tab === 'settings') settingsShell();
+}
+
 const actions = {
   async scan() {
     await api('/api/scan', { method: 'POST' });
@@ -994,14 +1011,23 @@ const actions = {
       toast('还没有可用的成片，先开始生成', 'err');
       return;
     }
-    toast('已切换壁纸', 'ok');
+    toast(state.data?.config.wallpaper.lockScreenMode === 'on-lock'
+      ? '已切换壁纸；锁屏会在下次锁定时同步'
+      : '已切换壁纸', 'ok');
     refreshState();
   },
   async 'rotation-toggle'() {
+    if (state.data?.rotation.intervalSeconds === 0) {
+      await enableRotation();
+      return;
+    }
     const enabled = state.data?.rotation.enabled;
     await api(enabled ? '/api/rotation/pause' : '/api/rotation/start', { method: 'POST' });
     toast(enabled ? '轮播已暂停' : '轮播已继续', 'ok');
     refreshState();
+  },
+  async 'enable-rotation'() {
+    await enableRotation();
   },
   async 'pipeline-toggle'() {
     const running = state.data?.pipeline.running;

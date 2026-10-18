@@ -211,49 +211,57 @@ func writeChoice(image: String, lock: Bool, placement: Int) -> [String: Any] {
     let template = firstChoice(all["Desktop"] as? [String: Any]) ?? firstChoice(all["Idle"] as? [String: Any])
     let choice = makeImageChoice(template: template, imageURL: url, placement: placement)
 
-    // Unified mode = "desktop and lock screen use the same wallpaper".
-    // WallpaperAgent then keeps only an Idle section; writing Desktop makes it
-    // churn on every restart, so skip it.
-    if unified {
-        all.removeValue(forKey: "Desktop")
-    } else {
-        var desktop = all["Desktop"] as? [String: Any] ?? [:]
-        applyChoice(to: &desktop, choice: choice)
-        all["Desktop"] = desktop
+    // Write the choice into every section that can hold a wallpaper: the
+    // global fallback, each display, and each Space. macOS stores per-Space
+    // overrides, so updating only AllSpacesAndDisplays leaves other desktops
+    // on the previous image.
+    func updateSection(_ section: inout [String: Any]) {
+        if unified {
+            section.removeValue(forKey: "Desktop")
+        } else {
+            var desktop = section["Desktop"] as? [String: Any] ?? [:]
+            applyChoice(to: &desktop, choice: choice)
+            section["Desktop"] = desktop
+        }
+        var idle = section["Idle"] as? [String: Any] ?? [:]
+        applyChoice(to: &idle, choice: choice)
+        section["Idle"] = idle
     }
 
-    var idle = all["Idle"] as? [String: Any] ?? [:]
-    applyChoice(to: &idle, choice: choice)
-    all["Idle"] = idle
+    updateSection(&all)
     store["AllSpacesAndDisplays"] = all
 
     if var displays = store["Displays"] as? [String: Any], !displays.isEmpty {
         for (key, value) in displays {
             guard var section = value as? [String: Any] else { continue }
-            if unified {
-                section.removeValue(forKey: "Desktop")
-            } else if var d = section["Desktop"] as? [String: Any] {
-                applyChoice(to: &d, choice: choice)
-                section["Desktop"] = d
-            }
-            var i = section["Idle"] as? [String: Any] ?? [:]
-            applyChoice(to: &i, choice: choice)
-            section["Idle"] = i
+            updateSection(&section)
             displays[key] = section
         }
         store["Displays"] = displays
     }
 
-    if var def = store["SystemDefault"] as? [String: Any] {
-        if unified {
-            def.removeValue(forKey: "Desktop")
-        } else if var d = def["Desktop"] as? [String: Any] {
-            applyChoice(to: &d, choice: choice)
-            def["Desktop"] = d
+    if var spaces = store["Spaces"] as? [String: Any], !spaces.isEmpty {
+        for (spaceKey, value) in spaces {
+            guard var space = value as? [String: Any] else { continue }
+            if var def = space["Default"] as? [String: Any] {
+                updateSection(&def)
+                space["Default"] = def
+            }
+            if var spaceDisplays = space["Displays"] as? [String: Any] {
+                for (displayKey, value) in spaceDisplays {
+                    guard var section = value as? [String: Any] else { continue }
+                    updateSection(&section)
+                    spaceDisplays[displayKey] = section
+                }
+                space["Displays"] = spaceDisplays
+            }
+            spaces[spaceKey] = space
         }
-        var i = def["Idle"] as? [String: Any] ?? [:]
-        applyChoice(to: &i, choice: choice)
-        def["Idle"] = i
+        store["Spaces"] = spaces
+    }
+
+    if var def = store["SystemDefault"] as? [String: Any] {
+        updateSection(&def)
         store["SystemDefault"] = def
     }
 

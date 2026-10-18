@@ -52,7 +52,10 @@ export async function createApp({ logger, autoStart = true } = {}) {
     config,
     wallpaper,
     logger,
-    onUpdate: (event) => bus.emit('invalidate', event),
+    onUpdate: (event) => {
+      bus.emit('invalidate', event);
+      if (event.type === 'applied') refreshScreenInfo().catch(() => {});
+    },
   });
   const pipeline = new Pipeline({
     store,
@@ -190,8 +193,13 @@ export async function createApp({ logger, autoStart = true } = {}) {
     next.scan.concurrency = Math.max(1, Math.min(4, Number(next.scan.concurrency) || 3));
     next.selection.count = Math.max(1, Number(next.selection.count) || 48);
     next.ark.concurrency = Math.max(1, Math.min(4, Number(next.ark.concurrency) || 2));
-    const interval = Number(next.rotation.intervalSeconds);
-    next.rotation.intervalSeconds = Number.isFinite(interval) ? Math.max(0, Math.round(interval)) : 1800;
+    const rawInterval = next.rotation.intervalSeconds;
+    if (rawInterval === '' || rawInterval == null) {
+      next.rotation.intervalSeconds = prevInterval;
+    } else {
+      const interval = Number(rawInterval);
+      next.rotation.intervalSeconds = Number.isFinite(interval) ? Math.max(0, Math.round(interval)) : prevInterval;
+    }
     next.output.width = Math.max(1280, Number(next.output.width) || 3840);
     next.output.height = Math.max(720, Number(next.output.height) || 2160);
     next.wallpaper.placement = Math.max(0, Math.min(5, Number(next.wallpaper.placement) || 1));
@@ -213,7 +221,7 @@ export async function createApp({ logger, autoStart = true } = {}) {
       await wallpaper.setUnified(next.wallpaper.lockScreenMode !== 'off').catch((err) => logger.warn(`切换锁屏模式失败：${err.message}`));
       await refreshScreenInfo();
     }
-    logger.info(`设置已更新：每 ${config.rotation.intervalSeconds} 秒轮播 · 锁屏模式 ${config.wallpaper.lockScreenMode}`);
+    logger.info(`设置已更新：每 ${config.rotation.intervalSeconds} 秒轮播（原 ${prevInterval} 秒） · 锁屏模式 ${config.wallpaper.lockScreenMode}`);
     bus.emit('invalidate', { type: 'settings' });
     return config;
   }
